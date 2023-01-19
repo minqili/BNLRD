@@ -1,0 +1,128 @@
+% Defect Detection
+% Example code
+function [salMap] = ml_BNLD_simple(img,paras)
+k0=paras.k; 
+X = im2double(img);  
+img_size=size(X);
+
+%---------------------------------------------------------------
+% Generate superpixels using SLIC
+%---------------------------------------------------------------
+if size(img,3)<3
+    img(:,:,2)=img(:,:,1);
+    img(:,:,3)=img(:,:,1);
+end
+num_label=(img_size(1)/paras.supersize)*(img_size(2)/paras.supersize);
+[labels, numlabels] = slicomex(img,num_label);%numlabels is the same as number of superpixels
+
+LL=labels(:);  % order labels
+[num, ia, ic] =unique(LL);
+Img_c=reshape(ic,size(labels,1),size(labels,2));
+super_labels=Img_c;
+  
+%% Show superpixel boundary
+itm = display_superpixels(super_labels, img);
+figure(1); imshow(itm);
+
+sup.num=numlabels;
+sup.label=labels+1;
+sup.pixIdx = cell(sup.num, 1);
+sup.pixNum = zeros(sup.num,1);
+for i = 1:sup.num
+     temp = find(sup.label==i);
+     sup.pixIdx{i} = temp;
+     sup.pixNum(i) = length(temp);
+end
+sup.pos = GetNormedMeanPos(sup.pixIdx, img_size(1), img_size(2));
+
+%% Construct superpixel features 
+X=im2single(img);
+patch_id=sup.pixIdx';
+[Sfeature_gabor53    Sfeature_img_gabor] =my_GaborFeature(X, sup);
+[Sfeature_gabor53b    Sfeature_img_gabor] =my_GaborFeature(1-X, sup);  
+
+X1=Sfeature_gabor53';  
+
+%Superpixel prior   
+thresh=13;
+patch_prior = zeros(1,size(X1,2));
+for i=1:size(X1,2)
+    dis_t=repmat(X1(:,i) , 1 , size(X1, 2)) -X1;
+    dis_t=sum(dis_t.^2) ;
+    [dis_t_value, dis_t_list]=sort(dis_t,'ascend'); 
+    patch_prior(i)=mean(dis_t_value(1:thresh));   
+end   
+   
+prior_norm=mat2gray(patch_prior);    
+prior = recover_saliency( double(X(:,:,1)), prior_norm , patch_id);  
+
+
+[Sfeature_gabor53c    Sfeature_img_gabor] =my_GaborFeature(prior, sup);  
+features = Sfeature_gabor53'+Sfeature_gabor53c'+Sfeature_gabor53b';
+X1=double(X(:,:,2));
+
+%---------------------------------------------------------------
+% PBNLRD model inference
+%---------------------------------------------------------------
+
+%% Initialize model parameters
+Theta0 = InitialPara_random(X1,k0); 
+Theta0.lambda1=1;
+Theta0.lambda2=1;    
+Theta0.patch_id=patch_id;
+Theta0.features=features;
+
+position_idx = [];
+index = reshape(1:prod(img_size), img_size);
+for ii=1:numlabels
+    [i,j]=find(super_labels==ii);
+    positions_super(:,ii)=[round(mean(i)), round(mean(j))];
+    position_idx =[position_idx; index(positions_super(1,ii),  positions_super(2,ii) )];
+end
+b1=20;
+x1=find(positions_super(2,:)<b1);
+x2=find(positions_super(2,:)> (img_size(2)-b1));
+y1=find(positions_super(1,:)<b1);
+y2=find(positions_super(1,:)> (img_size(1)-b1));
+borders = unique([x1 x2 y1 y2]);
+
+T=graythresh(patch_prior); % T=0.9;
+patch_prior=im2bw(patch_prior,1*T);
+prior_map=prior;
+[ prior] =recover_saliency(double(X(:,:,1)), patch_prior , patch_id);  %
+
+Theta0.prior=imfilter(prior,fspecial('gaussian',[9,9],2));
+Theta0.prior_map=prior_map;
+Theta0.prior_map
+MCMCpara.nBurnin=200;
+MCMCpara.nCollect=30;
+%% Model inference
+Output = Bayesian_PBNLRD(X1.*255,Theta0, MCMCpara); 
+
+
+%---------------------------------------------------------------
+% Generate salmap
+%---------------------------------------------------------------
+salMap=generate_salmap(X, Output.Sparse_mean, Theta0,  borders);
+% S0=features;
+% Sb = S0(:,borders);
+% ww=sum(abs(Sb) );
+% kk=exp(-1*ww);
+% mask=ones(size(S0));
+% mask(:,borders)=repmat(kk, size(S0,1),1) ; %S = S0.*mask;
+% 
+% salMap=mat2gray(abs(Output.Sparse_mean));
+% mask2= recover_saliency(double(X(:,:,1)), mask , patch_id); 
+% mask2= imfilter(mask2/max(mask2(:)),fspecial('gaussian',[9,9],2));  
+% salMap=salMap.*mask2;
+% 
+% salMap=(Theta0.prior).*salMap;
+% salMap = imfilter(salMap,fspecial('gaussian',[9,9],2));
+
+endnote=1;
+
+
+ 
+    
+    
+
