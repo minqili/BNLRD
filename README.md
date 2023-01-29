@@ -28,4 +28,5 @@ Reference:
 
 [2] Radhakrishna Achanta, Appu Shaji, Kevin Smith, Aurelien Lucchi, Pascal Fua, and Sabine Süsstrunk, SLIC Superpixels Compared to State-of-the-art Superpixel Methods, IEEE TPAMI, vol. 34, num. 11, p. 2274 - 2282, May 2012.
 
-          
+[3] H. Y. Ngan and G. K. Pang, Regularity analysis for patterned texture inspection, IEEE Transactions on automation science and engineering,
+vol. 6, no. 1, pp. 131–144, 2008.       
