@@ -20,6 +20,7 @@ mex slicomex.c  slicmex.c  slicsupervoxelmex.c
 
 ===========================================================================
 Reference:
+
 [1] Peng H, Li B, Ling H, et al. Salient object detection via structured matrix decomposition[J]. IEEE TPAMI, 2016, 39(4): 818-832.
 
 [2] Radhakrishna Achanta, Appu Shaji, Kevin Smith, Aurelien Lucchi, Pascal Fua, and Sabine Süsstrunk, SLIC Superpixels Compared to State-of-the-art Superpixel Methods, IEEE TPAMI, vol. 34, num. 11, p. 2274 - 2282, May 2012.
