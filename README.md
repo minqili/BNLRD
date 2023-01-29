@@ -3,6 +3,7 @@ This package contains our implementation for:
 "Fabric Defect Detection based on Bayesian  Non-negative Low-rank Decomposition"
 
 ===========================================================================
+
 *** The code is run on MATLAB R2014a-2018a on Windows 11 64 bit.
 
 Usage:
