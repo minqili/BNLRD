@@ -1,6 +1,7 @@
 # BNLRD
 This package contains our implementation for:
 "Fabric Defect Detection based on Bayesian  Non-negative Low-rank Decomposition"
+
 ===========================================================================
 *** The code is run on MATLAB R2014a-2018a on Windows 11 64 bit.
 
@@ -19,6 +20,7 @@ If SLICEdemo.m for superpixels is not working, please try to re-compile the code
 mex slicomex.c  slicmex.c  slicsupervoxelmex.c
 
 ===========================================================================
+
 Reference:
 
 [1] Peng H, Li B, Ling H, et al. Salient object detection via structured matrix decomposition[J]. IEEE TPAMI, 2016, 39(4): 818-832.
