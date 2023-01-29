@@ -20,8 +20,8 @@ Parts of the codes are encrypted. Full codes will be released later.
 
 If SLICEdemo.m for superpixels is not working, please try to re-compile the codes of SLICE_mex as,
 >> cd ./utilities/SLIC_mex
->> 
-mex slicomex.c  slicmex.c  slicsupervoxelmex.c
+
+>> mex slicomex.c  slicmex.c  slicsupervoxelmex.c
 
 ===========================================================================
 
