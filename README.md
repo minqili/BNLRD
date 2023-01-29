@@ -8,7 +8,9 @@ This package contains our implementation for:
 
 Usage:
 >> run 'main_BNLRD_demo.m'
+
 >> the output saliency maps and results are stored in the file '\results'
+
 >> the evaluation results are stored in the file '\figure'
 
 
